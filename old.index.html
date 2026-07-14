@@ -1,0 +1,285 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="aarishfavicon.png">
+    <title>Congratulations Aarish</title>
+
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #ffffff;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            /* Changed from space-between */
+            overflow: auto;
+            /* Changed from hidden */
+            font-family: Arial, sans-serif;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        /* CONTAINER FOR IMAGE AND BUTTONS */
+        .content-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+            max-width: 100%;
+        }
+
+        /* IMAGE CONTAINER - RESPONSIVE */
+        .image-container {
+            width: 100%;
+            max-width: 1080px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .image-container img {
+            max-width: 100%;
+            height: auto;
+            object-fit: contain;
+            display: block;
+        }
+
+        /* BUTTONS - RESPONSIVE */
+        .buttons {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px;
+            width: 100%;
+            max-width: 800px;
+            z-index: 5;
+        }
+
+        button {
+            padding: 12px 20px;
+            font-size: 16px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            background: #f2f2f2;
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            white-space: nowrap;
+            flex: 0 1 auto;
+            min-width: 120px;
+        }
+
+        button:hover {
+            background: #e5e5e5;
+            transform: scale(1.05);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+        }
+
+        button:active {
+            transform: scale(0.98);
+        }
+
+        /* Confetti fullscreen */
+        #confettiCanvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            pointer-events: none;
+            z-index: 10;
+        }
+
+        /* CLAP FLASH EFFECT */
+        .flash {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(255, 255, 255, 0.8);
+            animation: flashAnim 0.25s ease-out;
+            z-index: 9;
+            pointer-events: none;
+        }
+
+        @keyframes flashAnim {
+            0% {
+                opacity: 1;
+            }
+
+            100% {
+                opacity: 0;
+            }
+        }
+
+        /* TABLET BREAKPOINT */
+        @media (max-width: 768px) {
+            body {
+                padding: 15px;
+            }
+
+            .content-wrapper {
+                gap: 15px;
+            }
+
+            .buttons {
+                gap: 8px;
+            }
+
+            button {
+                padding: 10px 16px;
+                font-size: 14px;
+                min-width: 100px;
+            }
+        }
+
+        /* MOBILE BREAKPOINT */
+        @media (max-width: 480px) {
+            body {
+                padding: 10px;
+            }
+
+            .content-wrapper {
+                gap: 12px;
+            }
+
+            .buttons {
+                margin: 120px;
+                gap: 8px;
+            }
+
+            button {
+                padding: 10px 12px;
+                font-size: 13px;
+                min-width: 80px;
+                flex: 1 1 calc(50% - 6px);
+                max-width: calc(50% - 6px);
+            }
+        }
+
+        /* VERY SMALL SCREENS */
+        @media (max-width: 320px) {
+            button {
+                font-size: 12px;
+                padding: 8px 10px;
+                min-width: 70px;
+            }
+        }
+
+        /* LANDSCAPE MODE ON MOBILE */
+        @media (max-height: 500px) and (orientation: landscape) {
+            body {
+                padding: 10px;
+            }
+
+            .content-wrapper {
+                gap: 10px;
+            }
+
+            button {
+                padding: 8px 12px;
+                font-size: 12px;
+                min-width: 90px;
+            }
+        }
+
+        /* LARGE SCREENS */
+        @media (min-width: 1200px) {
+            .content-wrapper {
+                gap: 25px;
+            }
+
+            button {
+                padding: 14px 24px;
+                font-size: 17px;
+                min-width: 140px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <canvas id="confettiCanvas"></canvas>
+
+    <!-- CONTENT WRAPPER -->
+    <div class="content-wrapper">
+        <!-- IMAGE -->
+        <div class="image-container">
+            <img src="congratulations.png" alt="Congrats">
+        </div>
+
+        <!-- BUTTONS BELOW THE IMAGE -->
+        <div class="buttons">
+            <button onclick="launchConfetti()">🎉 Confetti</button>
+            <button onclick="playClap()">👏 Clap</button>
+            <button onclick="playWoo()">🦉 Woo</button>
+            <button onclick="playWoohoo()">🗣️ Woohoo</button>
+            <button onclick="playHooray()">🌟 Hooray</button>
+        </div>
+    </div>
+
+    <!-- AUDIO ELEMENTS -->
+    <audio id="clapSound" src="applause.mp3" preload="auto"></audio>
+    <audio id="woohoo" src="woohoo.mp3" preload="auto"></audio>
+    <audio id="woo" src="woo.mp3" preload="auto"></audio>
+    <audio id="hooray" src="hooray.mp3" preload="auto"></audio>
+
+    <script>
+        const canvas = document.getElementById("confettiCanvas");
+        const confettiInstance = confetti.create(canvas, { resize: true });
+
+        function launchConfetti() {
+            confettiInstance({
+                particleCount: 200,
+                spread: 90,
+                startVelocity: 50,
+                origin: { y: 0.4 }
+            });
+        }
+
+        function playClap() {
+            const audio = document.getElementById("clapSound");
+            audio.currentTime = 0;
+            audio.play();
+
+            const flash = document.createElement("div");
+            flash.classList.add("flash");
+            document.body.appendChild(flash);
+            setTimeout(() => flash.remove(), 250);
+        }
+
+        function playWoo() {
+            const audio = document.getElementById("woo");
+            audio.currentTime = 0;
+            audio.play();
+        }
+
+        function playWoohoo() {
+            const audio = document.getElementById("woohoo");
+            audio.currentTime = 0;
+            audio.play();
+        }
+
+        function playHooray() {
+            const audio = document.getElementById("hooray");
+            audio.currentTime = 0;
+            audio.play();
+        }
+    </script>
+
+</body>
+
+</html>

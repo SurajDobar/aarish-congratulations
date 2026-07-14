@@ -1,0 +1,563 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/png" href="aarishfavicon.png">
+  <title>Congratulations Aarish</title>
+
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: radial-gradient(circle at top, #ffffff 0%, #f5f7fa 100%);
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      min-height: 100dvh;
+      color: #1a202c;
+      overflow-x: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .hero {
+      min-height: 100dvh;
+      width: 100%;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .content-wrapper {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      gap: 20px;
+      z-index: 4;
+      transition: all 0.3s ease;
+    }
+
+    /* Target: Mobile/Default first rules */
+    .card-container {
+      position: relative;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+      z-index: 1;
+    }
+
+    .bg-photo {
+      width: 90vw;
+      height: auto;
+      aspect-ratio: 16 / 9;
+      object-fit: contain;
+      border-radius: 12px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.8);
+      background: #ffffff;
+    }
+
+    .celebrate-wrap {
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      position: relative;
+    }
+
+    .video-box {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      width: clamp(140px, 15vw, 240px);
+      height: 60vh;
+      max-height: 70%;
+      overflow: hidden;
+      border: none;
+      background: transparent;
+      box-shadow: none;
+      opacity: 0;
+      transition: opacity 0.35s ease, transform 0.35s ease;
+      z-index: 10; /* Set z-index to 10 so it's above the background photo (z-index 1) */
+      pointer-events: none;
+    }
+
+    .video-box.left {
+      left: 1.5vw;
+    }
+
+    .video-box.right {
+      right: 1.5vw;
+    }
+
+    .party-active .video-box {
+      opacity: 1;
+    }
+
+    .video-box video {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      display: block;
+    }
+
+    .party-glow {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      opacity: 0;
+      background:
+        radial-gradient(circle at 15% 25%, rgba(255, 99, 146, 0.25), transparent 40%),
+        radial-gradient(circle at 85% 25%, rgba(56, 189, 248, 0.25), transparent 40%),
+        radial-gradient(circle at 50% 75%, rgba(253, 224, 71, 0.25), transparent 45%);
+      z-index: 2;
+      transition: opacity 0.5s ease;
+    }
+
+    .party-active .party-glow {
+      opacity: 1;
+      animation: glowPulse 2s ease-in-out infinite alternate;
+    }
+
+    .controls-container {
+      width: 100%;
+      max-width: 650px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+      z-index: 5;
+    }
+
+    button {
+      font-family: inherit;
+      border: none;
+      cursor: pointer;
+      font-weight: 600;
+      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .celebrate-btn {
+      min-width: clamp(240px, 45vw, 380px);
+      background: linear-gradient(135deg, #ffd14f, #ff9c42);
+      color: #2a1400;
+      font-size: clamp(16px, 1.8vw, 20px);
+      font-weight: 700;
+      padding: 16px 32px;
+      border-radius: 16px;
+      box-shadow: 0 10px 25px rgba(255, 156, 66, 0.35), 0 4px 10px rgba(255, 156, 66, 0.15);
+      animation: pulse 2.5s infinite;
+    }
+
+    .celebrate-btn:hover {
+      background: linear-gradient(135deg, #ffe066, #ffa852);
+      box-shadow: 0 14px 32px rgba(255, 156, 66, 0.45), 0 4px 12px rgba(255, 156, 66, 0.2);
+      transform: translateY(-2px);
+      animation-play-state: paused;
+    }
+
+    .celebrate-btn:active {
+      transform: translateY(1px);
+    }
+
+    .extra-controls {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 12px;
+      width: 100%;
+    }
+
+    .extra-controls button {
+      padding: 12px 20px;
+      font-size: 14px;
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.85);
+      color: #2d3748;
+      border: 1px solid rgba(0, 0, 0, 0.08);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      white-space: nowrap;
+    }
+
+    .extra-controls button:hover {
+      background: #ffffff;
+      border-color: rgba(255, 156, 66, 0.4);
+      color: #1a202c;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.06);
+      transform: translateY(-2px);
+    }
+
+    .extra-controls button:active {
+      transform: translateY(0);
+    }
+
+    /* Confetti fullscreen */
+    #confettiCanvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      pointer-events: none;
+      z-index: 12;
+    }
+
+    /* CLAP FLASH EFFECT */
+    .flash {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(255,255,255,0.75);
+      animation: flashAnim 0.25s ease-out;
+      z-index: 9;
+      pointer-events: none;
+    }
+
+    @keyframes flashAnim {
+      0% { opacity: 1; }
+      100% { opacity: 0; }
+    }
+
+    @keyframes glowPulse {
+      0% { opacity: 0.6; }
+      100% { opacity: 1; }
+    }
+
+    @keyframes pulse {
+      0% {
+        transform: scale(1);
+        box-shadow: 0 10px 25px rgba(255, 156, 66, 0.35);
+      }
+      50% {
+        transform: scale(1.025);
+        box-shadow: 0 14px 30px rgba(255, 156, 66, 0.5);
+      }
+      100% {
+        transform: scale(1);
+        box-shadow: 0 10px 25px rgba(255, 156, 66, 0.35);
+      }
+    }
+
+    /* PC SCREEN STYLES (min-width: 769px) */
+    @media (min-width: 769px) {
+      .hero {
+        padding: 20px;
+      }
+
+      .content-wrapper {
+        gap: 20px;
+      }
+
+      /* 90% Width and 70% Height constraints for the card container */
+      .card-container {
+        flex-direction: row;
+        justify-content: center;
+        align-items: center;
+        width: 90vw;
+        height: 70vh;
+        max-width: calc(70vh * 16 / 9);
+        max-height: calc(90vw * 9 / 16);
+        z-index: 1; /* Photo container at z-index 1 */
+      }
+
+      .bg-photo {
+        width: 100%;
+        height: 100%;
+        border-radius: 0;
+        box-shadow: none;
+        border: none;
+        background: transparent;
+      }
+
+      /* Position the button relative to flow (below the card) */
+      .celebrate-wrap {
+        position: static;
+        transform: none;
+        width: auto;
+        z-index: 12;
+      }
+
+      .controls-container {
+        max-width: 800px;
+        z-index: 12;
+        margin-top: 10px;
+      }
+    }
+
+    /* RESPONSIVE BREAKPOINTS for videos/smaller devices */
+    @media (max-width: 1200px) {
+      .video-box {
+        width: 16vw;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .hero {
+        padding: 16px 12px;
+      }
+
+      .content-wrapper {
+        gap: 16px;
+      }
+
+      .bg-photo {
+        border-radius: 12px;
+      }
+
+      .video-box {
+        width: 90px;
+        height: auto;
+        bottom: 120px;
+        top: auto;
+        transform: none;
+      }
+
+      .video-box.left {
+        left: 8px;
+      }
+
+      .video-box.right {
+        right: 8px;
+      }
+
+      .extra-controls button {
+        padding: 10px 16px;
+        font-size: 13px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .bg-photo {
+        border-radius: 8px;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+      }
+
+      .controls-container {
+        gap: 14px;
+      }
+
+      .celebrate-btn {
+        padding: 12px 24px;
+        font-size: 15px;
+      }
+
+      .extra-controls {
+        gap: 8px;
+      }
+
+      .extra-controls button {
+        padding: 8px 12px;
+        font-size: 12px;
+        border-radius: 10px;
+      }
+
+      .video-box {
+        width: 70px;
+      }
+
+      .video-box.left {
+        left: 4px;
+      }
+
+      .video-box.right {
+        right: 4px;
+      }
+    }
+
+    @media (max-height: 500px) and (orientation: landscape) {
+      .hero {
+        padding: 10px;
+      }
+
+      .content-wrapper {
+        flex-direction: row;
+        align-items: center;
+        max-height: 95vh;
+        gap: 20px;
+      }
+
+      .card-container {
+        flex: 1.2;
+        width: auto;
+        height: auto;
+      }
+
+      .bg-photo {
+        max-height: 80vh;
+      }
+
+      .controls-container {
+        flex: 1;
+        gap: 12px;
+      }
+
+      .video-box {
+        width: 80px;
+        height: auto;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <canvas id="confettiCanvas"></canvas>
+
+  <main class="hero" id="partyScene">
+    <div class="party-glow"></div>
+
+    <div class="video-box left">
+      <video loop muted playsinline>
+        <source src="husky_dance_clear.webm" type="video/webm">
+      </video>
+    </div>
+
+    <div class="video-box right">
+      <video loop muted playsinline>
+        <source src="wolf_dance_clear.webm" type="video/webm">
+      </video>
+    </div>
+
+    <div class="content-wrapper">
+      <div class="card-container">
+        <img class="bg-photo" src="Congratulation AARISH KHAN.png" alt="Congratulations Aarish Khan">
+      </div>
+
+      <div class="controls-container">
+        <div class="celebrate-wrap">
+          <button class="celebrate-btn" onclick="startCelebration()">🎊 Congratulations</button>
+        </div>
+
+        <div class="extra-controls">
+          <button onclick="launchConfetti()">🎉 Confetti</button>
+          <button onclick="playClap()">👏 Clap</button>
+          <button onclick="playWoo()">🦉 Woo</button>
+          <button onclick="playWoohoo()">🗣️ Woohoo</button>
+          <button onclick="playHooray()">🌟 Hooray</button>
+        </div>
+      </div>
+    </div>
+  </main>
+
+
+  <!-- AUDIO ELEMENTS -->
+  <audio id="clapSound" src="applause.mp3" preload="auto"></audio>
+  <audio id="woohoo" src="woohoo.mp3" preload="auto"></audio>
+  <audio id="woo" src="woo.mp3" preload="auto"></audio>
+  <audio id="hooray" src="hooray.mp3" preload="auto"></audio>
+  <audio id="bgm_congrats" src="bgm_congrats.mp3" preload="auto"></audio>
+
+  <script>
+    const canvas = document.getElementById("confettiCanvas");
+    const confettiInstance = confetti.create(canvas, { resize: true });
+    const partyScene = document.getElementById("partyScene");
+    const danceVideos = document.querySelectorAll(".video-box video");
+    let partyTimer = null;
+    let burstTimer = null;
+    let videoHideTimer = null;
+
+    function launchConfetti() {
+      confettiInstance({
+        particleCount: 200,
+        spread: 90,
+        startVelocity: 50,
+        origin: { y: 0.4 }
+      });
+    }
+
+    function startCelebration() {
+      partyScene.classList.add("party-active");
+      danceVideos.forEach((video) => {
+        video.currentTime = 0;
+        video.play();
+      });
+      launchConfetti();
+      playHooray();
+      playClap(); // Trigger clapping sound and flash effect
+
+      const bgm = document.getElementById("bgm_congrats");
+      if (bgm) {
+        bgm.currentTime = 0;
+        bgm.play();
+      }
+
+      clearTimeout(partyTimer);
+      clearInterval(burstTimer);
+
+      burstTimer = setInterval(() => {
+        confettiInstance({
+          particleCount: 70,
+          spread: 120,
+          startVelocity: 38,
+          scalar: 1.05,
+          origin: { x: Math.random(), y: Math.random() * 0.35 + 0.15 }
+        });
+      }, 420);
+
+      partyTimer = setTimeout(() => {
+        clearInterval(burstTimer);
+      }, 21000); // Confetti bursts run for the duration of the audio
+
+      clearTimeout(videoHideTimer);
+      videoHideTimer = setTimeout(() => {
+        partyScene.classList.remove("party-active");
+        danceVideos.forEach((video) => {
+          video.pause();
+          video.currentTime = 0;
+        });
+        if (bgm) {
+          bgm.pause();
+          bgm.currentTime = 0;
+        }
+      }, 21000); // Videos and bgm stop after exactly 21 seconds (length of congrats audio)
+    }
+
+    function playClap() {
+      const audio = document.getElementById("clapSound");
+      audio.currentTime = 0;
+      audio.play();
+
+      const flash = document.createElement("div");
+      flash.classList.add("flash");
+      document.body.appendChild(flash);
+      setTimeout(() => flash.remove(), 250);
+    }
+
+    function playWoo() {
+      const audio = document.getElementById("woo");
+      audio.currentTime = 0;
+      audio.play();
+    }
+
+    function playWoohoo() {
+      const audio = document.getElementById("woohoo");
+      audio.currentTime = 0;
+      audio.play();
+    }
+
+    function playHooray() {
+      const audio = document.getElementById("hooray");
+      audio.currentTime = 0;
+      audio.play();
+    }
+  </script>
+
+</body>
+</html>
